@@ -3,7 +3,7 @@ export abstract class Item {
   sellIn: number;
   quality: number;
 
-  constructor(name, sellIn, quality) {
+  constructor(name: string, sellIn: number, quality: number) {
     this.name = name;
     this.sellIn = sellIn;
     this.quality = quality;
@@ -13,45 +13,63 @@ export abstract class Item {
 }
 
 export class ConjuredItem extends Item {
-  constructor(name, sellIn, quality) {
+  constructor(name: string, sellIn: number, quality: number) {
     super(name, sellIn, quality);
   }
 
   updateQuality() {
-    if (this.quality > 0) {
-      this.quality -= Math.max(this.quality - 2, 0);
+    this.quality = Math.max(this.quality - 2, 0);
+    if (this.sellIn <= 0) {
+      this.quality = Math.max(this.quality - 2, 0);
     }
   }
 }
 
-export class AgedBrieItem extends Item {
-  constructor(name, sellIn, quality) {
+export class AgedItem extends Item {
+  constructor(name: string, sellIn: number, quality: number) {
     super(name, sellIn, quality);
   }
 
   updateQuality() {
-    if (this.quality < 50) {
+    this.quality = Math.min(this.quality + 1, 50);
+  }
+}
+
+export class EventItem extends Item {
+  constructor(name: string, sellIn: number, quality: number) {
+    super(name, sellIn, quality);
+  }
+
+  updateQuality() {
+    if (this.sellIn <= 0) {
+      this.quality = 0;
+    } else if (this.sellIn <= 5) {
+      this.quality = Math.min(this.quality + 3, 50);
+    } else if (this.sellIn <= 10) {
+      this.quality = Math.min(this.quality + 2, 50);
+    } else {
       this.quality++;
     }
   }
 }
 
-export class EventItem extends Item {
-  constructor(name, sellIn, quality) {
+export class LegendaryItem extends Item {
+  constructor(name: string, sellIn: number, quality: number) {
+    super(name, sellIn, quality);
+  }
+
+  updateQuality() { }
+}
+
+export class NormalItem extends Item {
+  constructor(name: string, sellIn: number, quality: number) {
     super(name, sellIn, quality);
   }
 
   updateQuality() {
-    if (this.quality < 50) {
-      if (this.sellIn <= 0) {
-        this.quality = 0;
-      } else if (this.sellIn <= 5) {
-        this.quality += Math.max(this.quality + 3, 50);
-      } else if (this.sellIn <= 10) {
-        this.quality += Math.max(this.quality + 2, 50);
-      } else {
-        this.quality++;
-      }
+    this.quality = Math.max(this.quality - 1, 0);
+    if (this.sellIn <= 0) {
+      this.quality = Math.max(this.quality - 1, 0);
     }
   }
 }
@@ -72,7 +90,7 @@ export class GildedRose {
   }
 
   private decrementSellIn(item: Item) {
-    if (item.name !== 'Sulfuras, Hand of Ragnaros') {
+    if (!(item instanceof LegendaryItem)) {
       item.sellIn--;
     }
   }
